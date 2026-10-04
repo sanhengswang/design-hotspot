@@ -4,28 +4,38 @@
 <title>DESIGN HOTSPOT · 每日艺术设计热点</title>
 <meta name="description" content="每天抓取 6 个国际设计媒体，为每条报道生成专属角色插画。">
 <style>
-:root{--bg:#FFFFFF;--ink:#0D0E10;--sub:#6E7480;--line:#E8E4DC;--accent:#F2545B;--paper:#F7F5F0}
+:root{--bg:#FFFFFF;--ink:#0D0E10;--sub:#6E7480;--line:#E8E4DC;--accent:#F2545B;--paper:#F7F5F0;
+  --ease:cubic-bezier(.19,.7,.22,1);--ease-out:cubic-bezier(.2,.7,.2,1)}
 *{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
 body{background:var(--bg);color:var(--ink);
   font-family:"Helvetica Neue",Helvetica,Arial,"Microsoft YaHei","PingFang SC",sans-serif;
-  -webkit-font-smoothing:antialiased;overflow-x:hidden}
+  -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
+  text-rendering:optimizeLegibility;overflow-x:hidden}
+::selection{background:var(--ink);color:#fff}
+
 .nav{position:sticky;top:0;z-index:40;background:rgba(255,255,255,.94);
   backdrop-filter:blur(14px);border-bottom:2px solid var(--ink)}
-.nav-in{display:flex;align-items:center;gap:20px;padding:14px 34px;
+.nav-in{display:flex;align-items:center;gap:20px;padding:10px 34px;
   font-size:11px;letter-spacing:.16em;text-transform:uppercase;font-weight:700}
 .brand{font-weight:900;letter-spacing:.14em;font-size:13px}
 .mid{display:flex;gap:6px;margin-left:auto;flex-wrap:wrap}
-.mid a{color:var(--sub);text-decoration:none;cursor:pointer;padding:5px 12px;border-radius:999px;
-  border:1.5px solid transparent;transition:.16s}
+/* 命中区 ≥40px：可见胶囊只有 26px 高，用 min-height 撑开，视觉不变 */
+.mid a{color:var(--sub);text-decoration:none;cursor:pointer;
+  display:inline-flex;align-items:center;min-height:40px;padding:0 15px;
+  border-radius:999px;border:1.5px solid transparent;
+  transition-property:color,background-color,border-color,transform;
+  transition-duration:150ms;transition-timing-function:ease-out}
 .mid a:hover{color:var(--ink);border-color:var(--line)}
+.mid a:active{transform:scale(.96)}
 .mid a.on{color:#fff;background:var(--ink);border-color:var(--ink)}
+.mid a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .clock{color:var(--sub);font-variant-numeric:tabular-nums}
 
 /* ── 报头：巨大、贴边 ── */
-.masthead{padding:46px 34px 0;border-bottom:2px solid var(--ink)}
+.masthead{padding:40px 34px 0;border-bottom:2px solid var(--ink)}
 .masthead h1{font-size:clamp(58px,14.5vw,236px);line-height:.80;font-weight:900;
-  letter-spacing:-.055em;text-transform:uppercase}
+  letter-spacing:-.055em;text-transform:uppercase;text-wrap:balance}
 .masthead h1 em{font-style:normal;color:var(--accent)}
 .masthead .sub{display:flex;gap:26px;flex-wrap:wrap;align-items:baseline;
   margin:22px 0 18px;font-size:13px;color:var(--sub);line-height:1.75}
@@ -36,20 +46,30 @@ body{background:var(--bg);color:var(--ink);
 .card{grid-column:span 2;min-width:0}
 .card.wide{grid-column:span 3}
 .card a{display:block;text-decoration:none;color:inherit}
-.shot{position:relative;overflow:hidden;background:#EFECE5;border-radius:3px}
+.card a:focus-visible{outline:2px solid var(--accent);outline-offset:4px;border-radius:6px}
+/* 照片要能"压住"白底：一圈极淡内描边 + 一层很浅的投影 */
+.shot{position:relative;overflow:hidden;background:#EFECE5;border-radius:6px;
+  box-shadow:0 1px 2px rgba(13,14,16,.05),0 6px 16px rgba(13,14,16,.05)}
 .card .shot{aspect-ratio:4/3}
 .card.wide .shot{aspect-ratio:16/10}
 .shot img{width:100%;height:100%;object-fit:cover;display:block;
-  transition:transform 1.15s cubic-bezier(.19,.7,.22,1),filter .4s}
-.card a:hover .shot img{transform:scale(1.07)}
-.shot.nophoto{display:flex;align-items:center;justify-content:center;background:#F7F4EC}
+  outline:1px solid rgba(0,0,0,.08);outline-offset:-1px;
+  transition-property:transform,filter;
+  transition-duration:900ms,400ms;
+  transition-timing-function:var(--ease),ease-out}
+.card a:hover .shot img{transform:scale(1.06)}
+.card a:active .shot img{transform:scale(1.01);transition-duration:120ms,120ms}
+.shot.nophoto{display:flex;align-items:center;justify-content:center;background:#F7F4EC;box-shadow:none}
 .shot.nophoto svg{width:100%;height:100%;display:block}
-/* 插画降级成「图章」贴在照片角上 */
-.stamp{position:absolute;left:12px;bottom:12px;width:74px;height:60px;border-radius:4px;
-  overflow:hidden;background:#fff;box-shadow:0 6px 18px rgba(0,0,0,.22);
-  opacity:0;transform:translateY(8px) scale(.9);transition:.3s cubic-bezier(.2,.7,.2,1)}
+/* 插画降级成「图章」贴在照片角上：进带模糊，出更快更安静 */
+.stamp{position:absolute;left:12px;bottom:12px;width:74px;height:60px;border-radius:6px;
+  overflow:hidden;background:#fff;
+  box-shadow:0 1px 3px rgba(0,0,0,.14),0 6px 18px rgba(0,0,0,.22);
+  opacity:0;transform:translateY(8px) scale(.9);filter:blur(2px);
+  transition-property:opacity,transform,filter;
+  transition-duration:280ms;transition-timing-function:var(--ease-out)}
 .stamp svg{width:100%;height:100%;display:block}
-.card a:hover .stamp{opacity:1;transform:none}
+.card a:hover .stamp,.card a:focus-visible .stamp{opacity:1;transform:none;filter:none}
 
 /* ── 标题：放大、加粗 ── */
 .cap{padding:16px 2px 0}
@@ -59,31 +79,44 @@ body{background:var(--bg);color:var(--ink);
 .meta .s{color:var(--ink);font-weight:800}
 .meta .d{margin-left:auto;font-variant-numeric:tabular-nums}
 .cap h3{font-size:clamp(19px,1.85vw,27px);line-height:1.28;font-weight:800;
-  letter-spacing:-.02em;margin:9px 0 0;transition:color .16s}
-.card.wide .cap h3{font-size:clamp(24px,2.9vw,42px);line-height:1.16}
+  letter-spacing:-.02em;margin:9px 0 0;text-wrap:balance;
+  transition-property:color;transition-duration:160ms;transition-timing-function:ease-out}
+.card.wide .cap h3{font-size:clamp(24px,2.9vw,42px);line-height:1.16;text-wrap:balance}
 .card a:hover h3{color:var(--accent)}
-.en{font-size:12px;color:#A9AEB8;font-style:italic;margin-top:8px;
+.en{font-size:12px;color:#A9AEB8;font-style:italic;margin-top:8px;text-wrap:pretty;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
 .notes{padding:0 34px 10px;display:flex;flex-direction:column;gap:5px}
-.notes p{font-size:11.5px;color:#A6A9AF;font-style:italic}
+.notes p{font-size:11.5px;color:#A6A9AF;font-style:italic;text-wrap:pretty}
 .empty{padding:80px 34px;text-align:center;font-size:15px;color:#A6A9AF;font-style:italic}
 footer{border-top:2px solid var(--ink);padding:34px 34px 60px;display:flex;
   justify-content:space-between;gap:22px;flex-wrap:wrap;font-size:12px;color:var(--sub)}
 footer b{color:var(--ink)}
-.reveal{opacity:0;transform:translateY(20px);transition:opacity .65s ease,transform .65s cubic-bezier(.19,.7,.22,1)}
+.reveal{opacity:0;transform:translateY(20px);
+  transition-property:opacity,transform;
+  transition-duration:650ms;
+  transition-timing-function:ease,var(--ease)}
 .reveal.in{opacity:1;transform:none}
 @media(max-width:1100px){.grid{grid-template-columns:repeat(4,1fr)}
   .card{grid-column:span 2}.card.wide{grid-column:span 4}}
 @media(max-width:760px){
-  .nav-in{padding:11px 16px;gap:10px}.mid{gap:4px}
-  .mid a{padding:4px 9px;font-size:10px}
+  .nav-in{padding:8px 16px;gap:8px}.mid{gap:2px}
+  .mid a{padding:0 11px;font-size:10px;min-height:38px}
   .masthead{padding:28px 16px 0}
   .grid{grid-template-columns:1fr;gap:34px;padding:22px 16px 60px}
   .card,.card.wide{grid-column:auto}
   .card .shot,.card.wide .shot{aspect-ratio:4/3}
-  .stamp{opacity:1;transform:none;width:60px;height:48px}
+  .stamp{opacity:1;transform:none;filter:none;width:60px;height:48px}
   .notes,footer{padding-left:16px;padding-right:16px}
+}
+/* 尊重系统的"减少动态效果"设置 */
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;
+    transition-duration:.01ms!important}
+  .reveal{opacity:1;transform:none}
+  .shot img{transition:none}
+  .card a:hover .shot img{transform:none}
 }
 </style></head><body>
 <nav class="nav"><div class="nav-in">
